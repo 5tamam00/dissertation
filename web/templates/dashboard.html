@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
+    <title>Patient Dashboard</title>
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="{{url_for('index')}}">Home</a>
+        <a href="feedback" href="{{url_for('feedback')}}">Feedback</a>
+    </div>
+
+    <div class="container">
+        <nav class="sidebar">
+            <button onClick="uploadFile()">New Upload</button>
+            <button onclick="filterResults()">Filter</button>
+            <button onclick="exportResults()">Export Results</button>
+            <button onclick="openSettings()">Settings</button>
+            <button onclick="giveFeedback()">Give Feedback</button>
+        </nav>
+        <div class ="content">
+            <div id="patient-details">
+                <h3>Patient Details:</h3>
+            </div>
+
+            <div id="classification-results">
+                <h3>Classification Results:</h3>
+            </div>
+
+            <div id="treatment-recommendations">
+                <h3>Treatment Recommendations:</h3>
+            </div>
+
+        </div>
+        
+    </div>
+</body>
+</html>

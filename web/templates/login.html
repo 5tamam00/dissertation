@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Login{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="email">Email:</label>
+    <input name="email" id="emaile" required>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <button type="submit">Login</button>
+  </form>
+{% endblock %}
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
+    <title>My Project</title>
+</head>
+<body>
+  <div class="topnav">
+    <a href="home" href="{{url_for('index')}}">Home</a>
+    <a href="feedback" href="{{url_for('feedback')}}">Feedback</a>
+  </div>
+   
+   <h2>Login</h2>
+  <form method="post" action="/login">
+    <label for="email">Email:</label>
+    <input name="username" id="username" required>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <p>Not Registered? <a href="/register"> Click Here</a></p>
+    <input type="submit" value="Log In">
+  </form>
+  <br />
+
+</body>
+</html>
+-->

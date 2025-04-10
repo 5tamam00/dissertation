@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<title>{% block title %}{% endblock %}My Project</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
+
+<nav>
+  <div class="logo">
+    <img src="{{url_for('static', filename='img/logo.png')}}" alt="logo" style="height: 50px;">
+  </div>
+  
+</nav>
+<section class="content">
+  
+  <ul>
+    {% if g.user %}
+      <li><span>{{g.user['email']}}</span>
+      <li><a href="{{url_for('logout')}}"></a>
+    {% else %}
+      <li><a href="{{url_for('register')}}">Register</a>
+      <li><a href="{{url_for('login')}}">Login</a>
+    {% endif %}
+  </ul>
+  {% for message in get_flashed_messages() %}
+    <div class="flash">{{message}}</div>
+  {% endfor %}
+  
+</section>
+<!--
+<div class="topnav">
+    <a class="active" href="{{url_for('index')}}">Home</a>
+    <a href="feedback" href="{{url_for('feedback')}}">Feedback</a>
+  </div>
+  
+   <h1>Welcome to Home Page</h1>
+
+  {% if not is_logged_in %}
+   <a href="{{url_for('login')}}">
+    <button>Login</button>
+   </a>
+   <a href="{{url_for('register')}}">
+    <button>Register</button>
+   </a>
+   <br />
+   {% else %}
+  <a href="{{url_for('logout')}}">
+    <button>Logout</button>
+  </a>
+  {% endif %}
+</html>
+-->
