@@ -115,10 +115,6 @@ def create_app(test_config=None):
         if not session.get('is_logged_in'):
           return redirect(url_for('login'))
         
-        if 'email' not in session:
-                flash('Please login to leave feedback!')
-                return redirect(url_for('login'))
-        
         if request.method == 'POST':
             comment = request.form.get('comment')
             user_email = session.get('email')
@@ -137,6 +133,9 @@ def create_app(test_config=None):
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
+        if not session.get('is_logged_in'):
+          return redirect(url_for('login'))
+        
         if request.method == 'POST':
             patient_data = {
                 'name': request.form.get('patient-name'),
@@ -171,7 +170,7 @@ def create_app(test_config=None):
             
             flash('file successfully uploaded')
             return redirect(url_for('dashboard'))
-        return render_template("dashbaord.html")
+        return render_template("upload.html")
     
     @app.route('/dashboard')
     def dashboard():

@@ -3,6 +3,7 @@
 {% block title %}Upload{% endblock %}
 
 {% block content %}
+{% if session.get('is_logged_in') %}
 <div class="dashboard-content">
     <img src="{{url_for('static', filename='img/patient.png')}}" class="patient-icon">
         <h3>Patient Details:</h3>
@@ -56,4 +57,5 @@
     </div>
         
 </div>
+{% endif %}
 {% endblock %}
