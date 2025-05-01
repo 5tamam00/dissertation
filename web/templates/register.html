@@ -1,43 +1,24 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Register{% endblock %}</h1>
-{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="email">Email:</label>
-    <input name="email" id="email" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <button type="submit">Register</button>
-  </form>
+<div class="form-container">
+    <h1>Welcome</h1>
+    <p>Please create your account</p>
+
+    <div class="button-toggle">
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+        <a href="{{ url_for('register') }}" class="btn active">Register</a>
+    </div>
+
+    <form method="post" class="auth-form">
+        <input name="email" id="email" placeholder="Email" required>
+        <input name="password" id="password" type="password" placeholder="Password" required>
+
+        <button type="submit" class="btn-submit"><img src="{{url_for('static', filename='img/register.png')}}"> Register</button>
+    </form>
+
+    <p class="bottom-text">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+</div>
 {% endblock %}
-
-<!--<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
-    <title>My Project</title>
-</head>
-<body>
-  <div class="topnav">
-    <a href="home" href="{{url_for('index')}}">Home</a>
-    <a href="feedback" href="{{url_for('feedback')}}">Feedback</a>
-  </div>
-
-  <h2>Register</h2>
-  <form method="post" action="/register">
-    <label for="email">Email:</label>
-    <input name="emial" id="email" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <p>Already Registered? <a href="/login"> Click Here</a></p>
-    <input type="submit" value="Register">
-  </form>
-
-</body>
-</html>
--->
