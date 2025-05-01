@@ -3,9 +3,14 @@
 {% block title %}Home{% endblock%}
 
 {% block content%}
-<h2>Welcome to Login/Register Page </h2>
-<ul>
-    <li><a href="{{url_for('login')}}">Login</li>
-     <li><a href="{{url_for('register')}}">Register</li>
-</ul>
+<div class="form-container">
+    <h1>Welcome to Home Page </h1>
+    <p>Please sign in to your account</p>
+
+    <div class="button-group">
+        <a href="{{url_for('login')}}" class="btn">Login</li>
+        <a href="{{url_for('register')}}" class="btn">Register</li>
+    </div>
+</div>
+
 {% endblock %}
