@@ -1,26 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
-    <title>Feedback</title>
-</head>
-<body>
-  <div class="topnav">
-    <a href="home" href="./index.html">Home</a>
-    <a class="active" href="./feedback.html">Feedback</a>
-    
-  </div>
+{% extends 'base.html' %}
 
-   <h2>Share your Feedback</h2>
-  <form method="post" action="/feedback">
-    <label for="comment">Comments:</label>
-    <input name="comment" id="comment" required>
-    
-    <input type="submit" value="Send">
-  </form>
-  <br />
+{% block title %}Feedback{% endblock %}
 
-</body>
-</html>
+{% block content %}
+  <section class="content">
+    <div class="form-container">
+      <h2>Share your Feedback</h2>
+    
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+              <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" class="auth-form">
+        <textarea name="comment" id="comment" required></textarea>
+        
+        <button type="submit" class="btn-submit"><img src="{{url_for('static', filename='img/check.png')}}">Send Feedback</button>
+      </form>
+      </div>
+  </section>
+
+{% endblock %}
