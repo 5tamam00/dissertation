@@ -3,6 +3,7 @@
 {% block title %}Upload{% endblock %}
 
 {% block content %}
+{% if session.get('is_logged_in') %}
 <div class="upload-content">
   <div class="upload-box">
     <div class="upload-header">
@@ -20,5 +21,5 @@
     </form>
   </div>
 </div>
-    
+  {% endif %}
 {% endblock %}
