@@ -1,0 +1,347 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+  background-color: #f2f2f2;
+}
+
+/* Navigation Bar */
+nav {
+  background-color: #0072C6;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav .logo {
+  margin-right: auto;
+}
+
+nav .logo img {
+  width: 65px;
+  height: auto;
+}
+
+nav .user-icon,
+nav .setting-icon,
+nav .feedback-icon ,
+nav .logout-icon,
+nav .new-upload {
+  margin: 15px;
+  position: relative;
+  display: inline-block;
+}
+
+nav .user-icon img,
+nav .setting-icon img,
+nav .feedback-icon img,
+nav .logout-icon img,
+nav .new-upload {
+  width: 35px;
+  height: 35px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.tooltip{
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Fade in animation */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Small arrow on top of tooltip */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+}
+
+/* Show the tooltip on hover */
+nav .user-icon:hover .tooltip,
+nav .setting-icon:hover .tooltip,
+nav .feedback-icon:hover .tooltip
+nav .logout-icon:hover .tooltip,
+nav .new-upload:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Center Content */
+section.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.upload-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.upload-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.upload-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.upload-header img {
+  width: 30px;
+  height: 30px;
+}
+
+/* Card Form Container */
+.form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 400px;
+}
+
+.button-group {
+  margin-top: 1.5rem;
+}
+
+.upload-form {
+  max-width: 400px;
+  margin: 0 auto;
+  font-family: sans-serif;
+}
+
+input, button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+/* Title and Text */
+.form-container h1 {
+  margin-bottom: 10px;
+}
+
+.form-container p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.btn {
+  display: inline-block;
+    background-color: #3b82f6; /* blue */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #2563eb; /* darker blue on hover */
+}
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.auth-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.btn-submit img {
+  width: 20px;
+  height: 20px;
+  padding-right: 15px;
+}
+
+.flash-message {
+  margin-top: 15px;
+  background-color: #d1e7dd;
+  color: #0f5132;
+  padding: 10px;
+  border-left: 5px solid #198754;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Buttons */
+.button-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.button-toggle .btn {
+  padding: 10px 20px;
+  margin: 0 5px;
+  background-color: #eee;
+  color: #333;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.button-toggle .btn.active {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.btn-submit {
+  padding: 10px;
+  background-color: #4a90e2;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #357ABD;
+}
+
+/* Bottom Link */
+.bottom-text {
+  margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.dashboard-content {
+  padding: 20px;
+}
+
+.patient-icon {
+  height: 40px;
+  width: 40px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.row {
+  display: flex;
+  gap: 20px;
+  
+}
+
+.col {
+  flex: 1;
+  margin-bottom: 30px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.dashboard-header img {
+  width: 30px;
+  height: 30px;
+}
+
+.dashboard-section {
+  width: 100%;
+  max-width: 1400px;
+  height: auto;
+  min-height: 50vh;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.export-results {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.export-results img {
+  width: 30px;
+  height: 30px;
+}
+
+.export-results button {
+  padding: 10px 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.export-results button:hover {
+  background-color: #2563eb;
+}
+
+/* Footer */
+footer {
+  background-color: #0072C6;
+  padding: 10px;
+  text-align: center;
+  color: white;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
