@@ -5,6 +5,7 @@ from flask_pymongo import PyMongo
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
+from ml_model import predict
 
 def create_app(test_config=None):
     load_dotenv()
@@ -130,6 +131,13 @@ def create_app(test_config=None):
                 return redirect(url_for('feedback'))
             
         return render_template('feedback.html')
+    
+    def predict(filepath):
+        classification_result = 'some_classifiaction'
+        prognosis_result = 'some_prognosis'
+        classification_conf = 0.95
+        prognosis_config = 0.90
+        return classification_result, prognosis_result, classification_conf, prognosis_config
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
@@ -156,15 +164,27 @@ def create_app(test_config=None):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
 
+                classification_result, prognosis_result, classification_conf, prognosis_config= predict(filepath) #replace with my model
+                prediction = {
+                    'classification': classification_result,
+                    'prognosis': prognosis_result,
+                    'accuracy': {
+                        'classification': classification_conf,
+                        'prognosis': prognosis_config
+                    },
+                    'model_version':'v1.0'
+                }
                 scan_data = {
                     'patient_id': patient_id,
                     'filename': filename,
                     'filepath': filepath,
-                    'uploaded_at': datetime.now()
+                    'uploaded_at': datetime.now(),
+                    'prediction': prediction
                 }
 
                 scans_collection = app.config['SCANS_COLLECTION']
                 scans_collection.insert_one(scan_data)
+
 
             session['patient_id'] = str(patient_id)
             
@@ -186,16 +206,6 @@ def create_app(test_config=None):
         scans = list(app.config['SCANS_COLLECTION'].find({'patient_id': ObjectId(patient_id)}))
 
         return render_template('dashboard.html', patient=patient, scans=scans)
-    
-    '''
-    @app.route('/predict', methods = ['POST'])
-    def predict():
-        try:
-
-            return jsonify({"prediction":predicted_class})
-        except Exception as e:
-            return jsonify({"error":str(e)})
-    '''
         
     @app.route('/logout')
     def logout():
