@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
 from ml_model import predict
 
+
 def create_app(test_config=None):
     load_dotenv()
     # create and configure the app
@@ -139,6 +140,7 @@ def create_app(test_config=None):
         prognosis_config = 0.90
         return classification_result, prognosis_result, classification_conf, prognosis_config
 
+
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
         if not session.get('is_logged_in'):
@@ -174,17 +176,18 @@ def create_app(test_config=None):
                     },
                     'model_version':'v1.0'
                 }
+
                 scan_data = {
                     'patient_id': patient_id,
                     'filename': filename,
                     'filepath': filepath,
                     'uploaded_at': datetime.now(),
                     'prediction': prediction
+
                 }
 
                 scans_collection = app.config['SCANS_COLLECTION']
                 scans_collection.insert_one(scan_data)
-
 
             session['patient_id'] = str(patient_id)
             

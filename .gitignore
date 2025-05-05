@@ -1,6 +1,4 @@
 .venv/
-.env
-.node_modules/
 
 .vscode/
 
@@ -16,6 +14,5 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-
 *.h5
-*..pkl
+*.pkl
