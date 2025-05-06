@@ -1,16 +1,55 @@
 import os
+import pickle
+import tempfile
+from PIL import Image
+import numpy as np
+import tensorflow as tf
 from dotenv import load_dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_pymongo import PyMongo
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 def create_app(test_config=None):
     load_dotenv()
     # create and configure the app
     app = Flask(__name__, template_folder='templates', instance_relative_config=True)
     
+    s3 = boto3.client('s3', 
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS'),
+        region_name='eu-north-1')
+    
+    def load_pickel_from_s3(bucket_name, key):
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            s3.download_fileobj(bucket_name, key, tmp_file)
+            tmp_file.seek(0)
+            model = pickle.load(tmp_file)
+        return model
+    def load_keras_from_s3(bucket_name, key):
+        with tempfile.NamedTemporaryFile(suffix=".h5") as tmp_file:
+            s3.download_fileobj(bucket_name, key, tmp_file)
+            tmp_file.seek(0)
+            model = tf.keras.models.load_model(tmp_file.name) 
+        return model
+
+    def preprocess_image(filepath, target_size=(224, 224), for_keras=True):
+        image = Image.open(filepath).convert('RGB')
+        image = image.resize(target_size)
+        image_array = np.array(image)
+
+        if for_keras:
+            image_array = image_array / 255.0  # Normalize
+            image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+        else:
+            image_array = image_array.flatten()  # Flatten for SVM
+            image_array = image_array / 255.0  # Normalize
+
+        return image_array
+
     mongo_uri = os.getenv('MONGO_URI')
     print('Loaded Mongo URI:', mongo_uri)
     if not mongo_uri:
@@ -168,10 +207,40 @@ def create_app(test_config=None):
                 scans_collection.insert_one(scan_data)
 
             session['patient_id'] = str(patient_id)
-            
+
+            # load model from S3
+            vgg_model = load_keras_from_s3('dissertation','vgg_model.h5')
+            svm_model = load_pickel_from_s3('dissertation','svm_model.pkl')
+
+            # load and process image
+            image = Image.open(filepath).convert('RGB')
+
+            # preprocessing for VGG16
+            vgg_img = image.resize((224, 244))
+            vgg_array = np.array(vgg_img)/255.0
+            vgg_array = np.expand_dims(vgg_array, axis=0)
+
+            # Classification
+            vgg_pred = vgg_model.predict(vgg_array)
+            classification_label = np.argmax(vgg_pred)
+
+            # SVM
+            svm_img = image.resize((128, 128))
+            svm_array = np.array(svm_img).flatten().reshape(1, -1)
+            prognosis = svm_model.predict(svm_array)[0]
+
+            #results
+            results_collection = app.config['RESULTS_COLLECTION']
+            results_collection.insert_one({
+                'patient_id': patient_id,
+                'classification': int(classification_label),
+                'prognosis': str(prognosis),
+                'timestamp': datetime.now()
+            })
             flash('file successfully uploaded')
+            
             return redirect(url_for('dashboard'))
-        return render_template("dashbaord.html")
+        
     
     @app.route('/dashboard')
     def dashboard():
@@ -185,18 +254,9 @@ def create_app(test_config=None):
         
         patient = app.config['PATIENTS_COLLECTION'].find_one({'_id': ObjectId(patient_id)})
         scans = list(app.config['SCANS_COLLECTION'].find({'patient_id': ObjectId(patient_id)}))
+        result = app.config['RESULTS_COLLECTION'].find_one({'patient_id': ObjectId(patient_id)})
 
-        return render_template('dashboard.html', patient=patient, scans=scans)
-    
-    '''
-    @app.route('/predict', methods = ['POST'])
-    def predict():
-        try:
-
-            return jsonify({"prediction":predicted_class})
-        except Exception as e:
-            return jsonify({"error":str(e)})
-    '''
+        return render_template('dashboard.html', patient=patient, scans=scans, result=result)
         
     @app.route('/logout')
     def logout():
