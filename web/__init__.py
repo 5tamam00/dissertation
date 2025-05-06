@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
 import boto3
 from botocore.exceptions import NoCredentialsError
+from ml_model import predict
 
 def create_app(test_config=None):
     load_dotenv()
@@ -160,10 +161,6 @@ def create_app(test_config=None):
         if not session.get('is_logged_in'):
           return redirect(url_for('login'))
         
-        if 'email' not in session:
-                flash('Please login to leave feedback!')
-                return redirect(url_for('login'))
-        
         if request.method == 'POST':
             comment = request.form.get('comment')
             user_email = session.get('email')
@@ -179,9 +176,20 @@ def create_app(test_config=None):
                 return redirect(url_for('feedback'))
             
         return render_template('feedback.html')
+    
+    def predict(filepath):
+        classification_result = 'some_classifiaction'
+        prognosis_result = 'some_prognosis'
+        classification_conf = 0.95
+        prognosis_config = 0.90
+        return classification_result, prognosis_result, classification_conf, prognosis_config
+
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
+        if not session.get('is_logged_in'):
+          return redirect(url_for('login'))
+        
         if request.method == 'POST':
             patient_data = {
                 'name': request.form.get('patient-name'),
@@ -202,11 +210,24 @@ def create_app(test_config=None):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
 
+                classification_result, prognosis_result, classification_conf, prognosis_config= predict(filepath) #replace with my model
+                prediction = {
+                    'classification': classification_result,
+                    'prognosis': prognosis_result,
+                    'accuracy': {
+                        'classification': classification_conf,
+                        'prognosis': prognosis_config
+                    },
+                    'model_version':'v1.0'
+                }
+
                 scan_data = {
                     'patient_id': patient_id,
                     'filename': filename,
                     'filepath': filepath,
-                    'uploaded_at': datetime.now()
+                    'uploaded_at': datetime.now(),
+                    'prediction': prediction
+
                 }
 
                 scans_collection = app.config['SCANS_COLLECTION']
@@ -235,7 +256,8 @@ def create_app(test_config=None):
             flash('file successfully uploaded')
             
             return redirect(url_for('dashboard'))
-        
+
+        return render_template("upload.html")
     
     @app.route('/dashboard')
     def dashboard():
@@ -252,7 +274,7 @@ def create_app(test_config=None):
         result = app.config['RESULTS_COLLECTION'].find_one({'patient_id': ObjectId(patient_id)})
 
         return render_template('dashboard.html', patient=patient, scans=scans, result=result)
-        
+
     @app.route('/logout')
     def logout():
         session.clear()
