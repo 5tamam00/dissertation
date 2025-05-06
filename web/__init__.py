@@ -86,6 +86,12 @@ def create_app(test_config=None):
     app.config['SCANS_COLLECTION'] = scans_collection
     app.config['RESULTS_COLLECTION'] = results_collection
 
+    # Load models once at startup
+    print("Loading models from S3...")
+    app.config['VGG_MODEL'] = load_keras_from_s3('dissertation25', 'vgg_model.h5')
+    app.config['SVM_MODEL'] = load_pickel_from_s3('dissertation25', 'svm_model.pkl')
+    print("Models loaded successfully.")
+
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -209,29 +215,18 @@ def create_app(test_config=None):
             session['patient_id'] = str(patient_id)
 
             # load model from S3
-            vgg_model = load_keras_from_s3('dissertation','vgg_model.h5')
-            svm_model = load_pickel_from_s3('dissertation','svm_model.pkl')
+            vgg_model = app.config['VGG_MODEL']
+            svm_model = app.config['SVM_MODEL']
 
-            # load and process image
-            image = Image.open(filepath).convert('RGB')
+            # preprocess and predict
+            vgg_array = preprocess_image(filepath, for_keras=True)
+            svm_array = preprocess_image(filepath, target_size=(128, 128), for_keras=False).reshape(1, -1)
 
-            # preprocessing for VGG16
-            vgg_img = image.resize((224, 244))
-            vgg_array = np.array(vgg_img)/255.0
-            vgg_array = np.expand_dims(vgg_array, axis=0)
-
-            # Classification
-            vgg_pred = vgg_model.predict(vgg_array)
-            classification_label = np.argmax(vgg_pred)
-
-            # SVM
-            svm_img = image.resize((128, 128))
-            svm_array = np.array(svm_img).flatten().reshape(1, -1)
-            prognosis = svm_model.predict(svm_array)[0]
+            classification_label = int(np.argmax(vgg_model.predict(vgg_array)))
+            prognosis = str(svm_model.predict(svm_array)[0])
 
             #results
-            results_collection = app.config['RESULTS_COLLECTION']
-            results_collection.insert_one({
+            app.config['RESULTS_COLLECTION'].insert_one({
                 'patient_id': patient_id,
                 'classification': int(classification_label),
                 'prognosis': str(prognosis),
