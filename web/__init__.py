@@ -1,18 +1,56 @@
 import os
+import pickle
+import tempfile
+from PIL import Image
+import numpy as np
+import tensorflow as tf
 from dotenv import load_dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_pymongo import PyMongo
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
+import boto3
+from botocore.exceptions import NoCredentialsError
 from ml_model import predict
-
 
 def create_app(test_config=None):
     load_dotenv()
     # create and configure the app
     app = Flask(__name__, template_folder='templates', instance_relative_config=True)
     
+    s3 = boto3.client('s3', 
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS'),
+        region_name='eu-north-1')
+    
+    def load_pickel_from_s3(bucket_name, key):
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            s3.download_fileobj(bucket_name, key, tmp_file)
+            tmp_file.seek(0)
+            model = pickle.load(tmp_file)
+        return model
+    def load_keras_from_s3(bucket_name, key):
+        with tempfile.NamedTemporaryFile(suffix=".h5") as tmp_file:
+            s3.download_fileobj(bucket_name, key, tmp_file)
+            tmp_file.seek(0)
+            model = tf.keras.models.load_model(tmp_file.name) 
+        return model
+
+    def preprocess_image(filepath, target_size=(224, 224), for_keras=True):
+        image = Image.open(filepath).convert('RGB')
+        image = image.resize(target_size)
+        image_array = np.array(image)
+
+        if for_keras:
+            image_array = image_array / 255.0  # Normalize
+            image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+        else:
+            image_array = image_array.flatten()  # Flatten for SVM
+            image_array = image_array / 255.0  # Normalize
+
+        return image_array
+
     mongo_uri = os.getenv('MONGO_URI')
     print('Loaded Mongo URI:', mongo_uri)
     if not mongo_uri:
@@ -48,6 +86,12 @@ def create_app(test_config=None):
     app.config['PATIENTS_COLLECTION'] = patients_collection
     app.config['SCANS_COLLECTION'] = scans_collection
     app.config['RESULTS_COLLECTION'] = results_collection
+
+    # Load models once at startup
+    print("Loading models from S3...")
+    app.config['VGG_MODEL'] = load_keras_from_s3('dissertation25', 'vgg_model.h5')
+    app.config['SVM_MODEL'] = load_pickel_from_s3('dissertation25', 'svm_model.pkl')
+    print("Models loaded successfully.")
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -190,9 +234,29 @@ def create_app(test_config=None):
                 scans_collection.insert_one(scan_data)
 
             session['patient_id'] = str(patient_id)
-            
+
+            # load model from S3
+            vgg_model = app.config['VGG_MODEL']
+            svm_model = app.config['SVM_MODEL']
+
+            # preprocess and predict
+            vgg_array = preprocess_image(filepath, for_keras=True)
+            svm_array = preprocess_image(filepath, target_size=(128, 128), for_keras=False).reshape(1, -1)
+
+            classification_label = int(np.argmax(vgg_model.predict(vgg_array)))
+            prognosis = str(svm_model.predict(svm_array)[0])
+
+            #results
+            app.config['RESULTS_COLLECTION'].insert_one({
+                'patient_id': patient_id,
+                'classification': int(classification_label),
+                'prognosis': str(prognosis),
+                'timestamp': datetime.now()
+            })
             flash('file successfully uploaded')
+            
             return redirect(url_for('dashboard'))
+
         return render_template("upload.html")
     
     @app.route('/dashboard')
@@ -207,9 +271,10 @@ def create_app(test_config=None):
         
         patient = app.config['PATIENTS_COLLECTION'].find_one({'_id': ObjectId(patient_id)})
         scans = list(app.config['SCANS_COLLECTION'].find({'patient_id': ObjectId(patient_id)}))
+        result = app.config['RESULTS_COLLECTION'].find_one({'patient_id': ObjectId(patient_id)})
 
-        return render_template('dashboard.html', patient=patient, scans=scans)
-        
+        return render_template('dashboard.html', patient=patient, scans=scans, result=result)
+
     @app.route('/logout')
     def logout():
         session.clear()
