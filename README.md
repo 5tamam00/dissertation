@@ -10,6 +10,13 @@
 Icons used in this project were taken from 
 - [Flaticon](https://www.flaticon.com/)
 - [Nucleo](https://nucleoapp.com/)
+- 'feedback' icon by Mia Elysia from <a href="https://thenounproject.com/browse/icons/term/feedback/" target="_blank" title="feedback Icons">Noun Project</a> (CC BY 3.0)
+- 'logout' icon by Jessiey from <a href="https://thenounproject.com/browse/icons/term/logout/" target="_blank" title="logout Icons">Noun Project</a> (CC BY 3.0)
+- <a href="https://www.flaticon.com/free-icons/success" title="success icons">Success icons created by Uniconlabs - Flaticon</a>
+- <a href="https://www.flaticon.com/free-icons/patient" title="patient icons">Patient icons created by RaftelDesign - Flaticon</a>
+- <a href="https://www.flaticon.com/free-icons/prognosis" title="prognosis icons">Prognosis icons created by Iconic Artisan - Flaticon</a>
+- <a href="https://www.flaticon.com/free-icons/covid-19" title="covid 19 icons">Covid 19 icons created by FreshForYou - Flaticon</a>
+- <a href="https://www.flaticon.com/free-icons/import-export" title="import export icons">Import export icons created by Triam Studio - Flaticon</a>
 
 [![](https://visitcount.itsvg.in/api?id=5tamam00&icon=0&color=0)](https://visitcount.itsvg.in)
 
