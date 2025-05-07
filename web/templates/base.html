@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Project{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}" >
+
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <a href="{{url_for('dashboard') if session.get('is_logged_in') else url_for('index')}}">
+        <img src="{{url_for('static', filename='img/logo.png')}}" alt="logo">
+      </a>     
+    </div>
+    
+    {% if session.get('is_logged_in') %}
+    <div class="feedback-icon">
+      <a href="{{url_for('feedback')}}">
+        <img src="{{url_for('static', filename='img/feedback.svg')}}" alt="feedback icon">
+      <span class="tooltip">Feedback</span>
+      </a>
+    </div>
+
+    <div class="new-upload">
+      <a href="{{url_for('upload')}}">
+        <img src="{{url_for('static', filename='img/upload.svg')}}" alt="new-upload">
+      <span class="tooltip">New Upload</span>
+      </a>
+    </div>
+
+    <div class="user-icon">
+      <img src="{{url_for('static', filename='img/profile.svg')}}" alt="user icon">
+      <span class="tooltip">Profile</span>
+    </div>
+    
+    <div class="logout-icon">
+      <a href="{{url_for('logout')}}">
+        <img src="{{url_for('static', filename='img/logout.svg')}}" alt="logout">
+        <span class="tooltip">Logout</span>
+      </a>
+    </div>
+    {% endif %}
+  </nav>
+
+  <section class="content">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+    
+  </section>
+  <footer>
+    <div id="footer">
+      <p>This project is a student project. It is intended for demonstration purpose only. </p>
+    </div> 
+  </footer>
+</body>
+  
+</html>

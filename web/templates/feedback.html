@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+{% if session.get('is_logged_in') %}
+  <section class="content">
+    <div class="form-container">
+      <h2>Share your Feedback</h2>
+    
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+              <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" class="auth-form">
+        <textarea name="comment" id="comment" required></textarea>
+        
+        <button type="submit" class="btn-submit"><img src="{{url_for('static', filename='img/check.png')}}">Send Feedback</button>
+      </form>
+      </div>
+  </section>
+{% endif %}
+{% endblock %}
