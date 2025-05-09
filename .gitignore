@@ -2,6 +2,7 @@
 .env
 .vscode/
 
+.node_modules/
 *.pyc
 __pycache__/
 
@@ -14,3 +15,6 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+*.h5
+*.pkl
