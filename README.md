@@ -24,8 +24,8 @@
 - Run the application: `flask run` 
 
 ### Links:
-- Prototype: https://www.figma.com/design/9gZc6Q0OA6fiWhejP24me4/UI?node-id=1-2&t=eS1ATvgxCXi5Q2R0-1![image](https://github.com/user-attachments/assets/c9831caa-c2fd-41c1-9d00-80ba04a94853)
-- Initial Survey: https://app.onlinesurveys.jisc.ac.uk/s/solent/exploring-ai-s-role-in-lung-cancer-classification-and-treatment ![image](https://github.com/user-attachments/assets/34a2d500-d759-46c4-b81a-a96e4d8d9215)
+- Prototype: https://www.figma.com/design/9gZc6Q0OA6fiWhejP24me4/UI?node-id=1-2&t=eS1ATvgxCXi5Q2R0-1
+- Initial Survey: https://app.onlinesurveys.jisc.ac.uk/s/solent/exploring-ai-s-role-in-lung-cancer-classification-and-treatment 
 
 
 # 💻 Tech Stack:
