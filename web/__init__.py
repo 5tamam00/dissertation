@@ -55,7 +55,7 @@ def create_app(test_config=None):
             image_array = np.expand_dims(image_array, axis=0)
             features = feature_extractor.predict(image_array) 
             image_array = features.flatten()
-            image_array = image_array.reshape(1, -1)  # Reshape to match the input shape for SVM
+            image_array = image_array.reshape(1, -1) 
 
         return image_array
 
@@ -87,32 +87,30 @@ def create_app(test_config=None):
     feedback_collection = mongo.db.feedback
     patients_collection = mongo.db.patient_details
     scans_collection = mongo.db.scans
-    results_collection = mongo.db.results
 
     #store collections
     app.config['USERS_COLLECTION'] = users_collection
     app.config['FEEDBACK_COLLECTION'] = feedback_collection
     app.config['PATIENTS_COLLECTION'] = patients_collection
     app.config['SCANS_COLLECTION'] = scans_collection
-    app.config['RESULTS_COLLECTION'] = results_collection
 
     # Load models once at startup
     print("Loading models from S3...")
     app.config['VGG_MODEL'] = load_keras_from_s3('dissertation25', 'vgg_model.h5')
-    app.config['SVM_MODEL'] = load_model_from_s3('dissertation25', 'svm_model.pkl')
+    app.config['RIDGE_MODEL'] = load_model_from_s3('dissertation25', 'ridge_model.pkl')
     print("Models loaded successfully.")
 
-    def predict(filepath, vgg_model, svm_model):
+    def predict(filepath, vgg_model, ridge_model):
         # Classification using VGG16
         vgg_array = preprocess_image(filepath, for_keras=True)
         classification_probabilities = vgg_model.predict(vgg_array)
         classification_label = int(np.argmax(classification_probabilities))
         classification_confidence = float(classification_probabilities[0][classification_label])
-        #Predict prognosis using SVM Model
-        svm_array = preprocess_image(filepath, target_size=(224, 224), for_keras=False)
-        print(f"shape of svm array: {svm_array.shape}")
-        prognosis = str(svm_model.predict(svm_array)[0])
-        prognosis_confidence = float(abs(svm_model.predict(svm_array)[0]))
+        #Predict prognosis using Ridge Model
+        ridge_array = preprocess_image(filepath, target_size=(224, 224), for_keras=False)
+        print(f"shape of ridge array: {ridge_array.shape}")
+        prognosis = str(ridge_model.predict(ridge_array)[0])
+        prognosis_confidence = float(abs(ridge_model.predict(ridge_array)[0]))
 
         classification_labels = {0: 'Normal', 1: 'Benign', 2: 'Malignant'}
         prognosis_labels = {0: 'Good', 1: 'Fair', 2: 'Poor'}
@@ -233,7 +231,7 @@ def create_app(test_config=None):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
 
-                classification_label_name, prognosis_label, classification_confidence, prognosis_confidence= predict(filepath, app.config['VGG_MODEL'], app.config['SVM_MODEL'])
+                classification_label_name, prognosis_label, classification_confidence, prognosis_confidence= predict(filepath, app.config['VGG_MODEL'], app.config['RIDGE_MODEL'])
 
                 result = {
                     'classification': classification_label_name,
